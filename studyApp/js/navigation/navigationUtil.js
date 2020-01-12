@@ -10,7 +10,7 @@ export default class NavigationUtil {
    */
   static goHomePage({params}) {
     let {navigation} = params;
-    navigation.navigate('MainRoute');
+    navigation.navigate('Main');
   }
   /**
    * 返回上一页
