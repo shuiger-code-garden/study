@@ -11,7 +11,7 @@ import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
 import {connect} from 'react-redux';
 import actions from '../store/action';
-import PopularItem from '../common/PopularItem';
+import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
 const URL = 'https://github.com/trending/';
 
@@ -121,7 +121,7 @@ class TrendingTab extends Component {
   }
   renderItem(item) {
     const {theme} = this.props;
-    return <PopularItem projectModel={item} theme={theme} />;
+    return <TrendingItem projectModel={item} theme={theme} />;
   }
   genIndicator() {
     return this._store().hideLoadingMore ? null : (
