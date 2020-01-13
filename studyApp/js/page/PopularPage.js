@@ -11,7 +11,8 @@ import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
 import {connect} from 'react-redux';
 import actions from '../store/action';
-import PopularItem from '../common/popularItem';
+import PopularItem from '../common/PopularItem';
+import NavigationBar from '../common/NavigationBar';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 
@@ -54,6 +55,7 @@ export default class PopularPage extends Component {
     let TabNavigation = this.handelTabNavigation();
     return (
       <View style={styles.wrapper}>
+        <NavigationBar title={'最热'} />
         <TabNavigation />
       </View>
     );
@@ -138,7 +140,7 @@ class PopularTab extends Component {
             console.log('---onEndReached----');
             setTimeout(() => {
               if (this.canLoadMore) {
-                //fix 滚动时两次调用onEndReached https://github.com/facebook/react-native/issues/14015
+                //     //fix 滚动时两次调用onEndReached https://github.com/facebook/react-native/issues/14015
                 this.loadData(true);
                 this.canLoadMore = false;
               }
