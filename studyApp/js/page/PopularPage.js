@@ -88,7 +88,7 @@ class PopularTab extends Component {
   loadData(loadMore) {
     const {onRefreshPopular, onLoadMorePopular} = this.props;
     const store = this._store();
-    const url = this.genFetchUrl();
+    const url = this.genFetchUrl(this.storeName);
     if (loadMore) {
       onLoadMorePopular(
         this.storeName,

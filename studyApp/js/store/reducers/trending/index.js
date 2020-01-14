@@ -25,7 +25,7 @@ const defaultState = {};
  * @param {*} action
  * @returns
  */
-export default function onAction(state = defaultState, action) {
+export default function Trending(state = defaultState, action) {
   switch (action.type) {
     case TRENDING_REFRESH_SUCCESS:
       return {

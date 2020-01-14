@@ -146,12 +146,12 @@ export default class DataStore {
    * @return {boolean} true 不需要更新,false需要更新
    */
   static checkTimestampValid(timestamp) {
-    const currentDate = new Date();
-    const targetDate = new Date(timestamp); // 通过毫秒设置时间
-    targetDate.setTime(timestamp);
-    if (currentDate.getMonth() !== targetDate.getMonth()) return false;
-    if (currentDate.getDate() !== targetDate.getDate()) return false;
-    if (currentDate.getHours() - targetDate.getHours() > 4) return false;
-    return true;
+    // const currentDate = new Date();
+    // const targetDate = new Date(timestamp); // 通过毫秒设置时间
+    // targetDate.setTime(timestamp);
+    // if (currentDate.getMonth() !== targetDate.getMonth()) return false;
+    // if (currentDate.getDate() !== targetDate.getDate()) return false;
+    // if (currentDate.getHours() - targetDate.getHours() > 4) return false;
+    return false;
   }
 }

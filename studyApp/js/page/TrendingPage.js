@@ -19,26 +19,7 @@ export default class TrendingPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      topTabs: [
-        'Awesome',
-        'C',
-        'Python',
-        'PHP',
-        'Java',
-        'Golang',
-        'C++',
-        'C#',
-        'JavaScript',
-        'Kotlin',
-        'Swift',
-        'Objective-C',
-        'Lua',
-        'Perl',
-        'Ruby',
-        'Shell',
-        'CSS',
-        'HTML',
-      ],
+      topTabs: ['JavaScript', 'PHP', 'C', 'C++', 'java', 'Node'],
     };
   }
   handleForEachTopTabs() {
@@ -104,11 +85,11 @@ class TrendingTab extends Component {
     return store;
   }
   loadData(loadMore) {
-    const {onRefreshPopular, onLoadMorePopular} = this.props;
+    const {onRefreshTrending, onLoadMoreTrending} = this.props;
     const store = this._store();
-    const url = this.genFetchUrl();
+    const url = this.genFetchUrl(this.storeName);
     if (loadMore) {
-      onLoadMorePopular(
+      onLoadMoreTrending(
         this.storeName,
         store.pageIndex,
         pageSize,
@@ -116,7 +97,7 @@ class TrendingTab extends Component {
         () => {},
       );
     } else {
-      onRefreshPopular(this.storeName, url, 10);
+      onRefreshTrending(this.storeName, url, pageSize);
     }
   }
   renderItem(item) {
@@ -132,7 +113,7 @@ class TrendingTab extends Component {
     );
   }
   genFetchUrl(key) {
-    return URL + key;
+    return URL + key + '?since=weekly';
   }
   render() {
     let store = this._store();
@@ -142,7 +123,7 @@ class TrendingTab extends Component {
         <FlatList
           data={store.projectModels}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => '' + item.id}
+          keyExtractor={item => `${item.fullName}`}
           refreshControl={
             <RefreshControl
               title={'Loading'}
@@ -175,18 +156,18 @@ class TrendingTab extends Component {
   }
 }
 
-const mapPopularStateToProps = state => ({
+const mapTrendingStateToProps = state => ({
   trending: state.trending,
   theme: state.theme.theme,
 });
 
-const mapPopularActionToProps = dispatch => ({
-  onRefreshPopular: (storeName, url, pageSize) => {
-    dispatch(actions.onRefreshPopular(storeName, url, pageSize));
+const mapTrendingActionToProps = dispatch => ({
+  onRefreshTrending: (storeName, url, pageSize) => {
+    dispatch(actions.onRefreshTrending(storeName, url, pageSize));
   },
-  onLoadMorePopular: (storeName, pageIndex, pageSize, dataArray, callback) => {
+  onLoadMoreTrending: (storeName, pageIndex, pageSize, dataArray, callback) => {
     dispatch(
-      actions.onLoadMorePopular(
+      actions.onLoadMoreTrending(
         storeName,
         pageIndex,
         pageSize,
@@ -198,8 +179,8 @@ const mapPopularActionToProps = dispatch => ({
 });
 
 const TrendingTabPage = connect(
-  mapPopularStateToProps,
-  mapPopularActionToProps,
+  mapTrendingStateToProps,
+  mapTrendingActionToProps,
 )(TrendingTab);
 
 const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-export default class PopularItem extends Component {
+export default class TrendingItem extends Component {
   onItemClick() {}
   _favoriteIcon() {
     const {theme} = this.props;
@@ -14,26 +14,31 @@ export default class PopularItem extends Component {
   }
   render() {
     const {projectModel} = this.props;
+    console.log(projectModel);
     const {item} = projectModel;
-    if (!item || !item.owner) return null;
-
+    const {TrendingRepoModel} = item;
+    if (!item) return null;
     return (
       <TouchableOpacity onPress={() => this.onItemClick()}>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.full_name}</Text>
-          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.description}>{item.meta}</Text>
           <View style={styles.row}>
             <View style={styles.row}>
               <Text>Author:</Text>
-              <Image
-                style={{height: 22, width: 22}}
-                source={{uri: item.owner.avatar_url}}
-              />
+              {item.contributors.map(contrbutor => {
+                return (
+                  <Image
+                    style={{height: 22, width: 22}}
+                    source={{uri: contrbutor}}
+                  />
+                );
+              })}
             </View>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text>Start:</Text>
-              <Text>{item.stargazers_count}</Text>
+              <Text>{item.starCount}</Text>
             </View>
             {this._favoriteIcon()}
           </View>

@@ -17,7 +17,7 @@ import {handleData} from '../actionUtil';
  * @param {*} pageSize
  * @returns
  */
-export function onRefreshPopular(storeName, url, pageSize) {
+export function onRefreshTrending(storeName, url, pageSize) {
   return dispatch => {
     dispatch({type: TRENDING_REFRESH, storeName});
     let dataStore = new DataStore();
@@ -54,7 +54,7 @@ export function onRefreshPopular(storeName, url, pageSize) {
  * @param {*} callback
  * @returns
  */
-export function onLoadMorePopular(
+export function onLoadMoreTrending(
   storeName,
   pageIndex,
   pageSize,
