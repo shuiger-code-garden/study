@@ -4,7 +4,7 @@ import ViewUtil from '../util/ViewUtil';
 import {WebView} from 'react-native-webview';
 import NavigationBar from '../common/NavigationBar';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import navigationUtil from '../navigation/navigationUtil';
+import NavigationUtil from '../navigation/navigationUtil';
 import BackPressComponent from '../common/BackPressComponent';
 const TRENDING_URL = 'https://github.com/';
 const THEME_COLOR = '#678';
@@ -40,9 +40,9 @@ export default class DetailPage extends Component {
   }
   onGoBack() {
     if (this.state.canGoBack) {
-      this.WebView.goBack();
+      this.webView.goBack();
     } else {
-      navigationUtil.goBack({
+      NavigationUtil.goBack({
         params: {
           navigation: this.props.navigation,
         },
