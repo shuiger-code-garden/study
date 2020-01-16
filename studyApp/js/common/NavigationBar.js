@@ -25,7 +25,7 @@ export default class NavigationBar extends Component {
     style: ViewPropTypes.style, // 自定义组件的样式
     title: PropTypes.string,
     titleView: PropTypes.element, //(react)
-    navBarTitleContainer: ViewPropTypes.style, // 标题的样式
+    titleLayoutStyle: ViewPropTypes.style, // 标题的样式
     hide: PropTypes.bool,
     statusBar: PropTypes.shape(StatusBarShape),
     rightButton: PropTypes.element,
@@ -54,7 +54,7 @@ export default class NavigationBar extends Component {
     let titleView = this.props.titleView ? (
       this.props.titleView
     ) : (
-      <Text ellipsizeMode={'tail'} numberOfLines={1} style={styles.title}>
+      <Text ellipsizeMode={'head'} numberOfLines={1} style={styles.title}>
         {this.props.title}
       </Text>
     );
@@ -63,10 +63,7 @@ export default class NavigationBar extends Component {
       <View style={styles.navBar}>
         {this.getButtonElement(this.props.leftButton)}
         <View
-          Style={[
-            styles.navBarTitleContainer,
-            this.props.navBarTitleContainer,
-          ]}>
+          style={[styles.navBarTitleContainer, this.props.titleLayoutStyle]}>
           {titleView}
         </View>
         {this.getButtonElement(this.props.rightButton)}
@@ -85,6 +82,7 @@ const styles = StyleSheet.create({
   //设置组件样式
   container: {
     backgroundColor: '#2196f3',
+    marginTop: DeviceInfo.isIPhoneX_deprecated ? 30 : 0,
   },
   // 设置按钮的样式
   navBarButton: {
@@ -102,10 +100,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    left: 40,
-    right: 40,
     top: 0,
     bottom: 0,
+    left: 40,
+    right: 40,
   },
   //设置文字的样式
   title: {

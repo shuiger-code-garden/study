@@ -6,6 +6,8 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity,
+  DeviceEventEmitter,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
@@ -13,6 +15,9 @@ import {connect} from 'react-redux';
 import actions from '../store/action';
 import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
+import TrendingDialog, {TimeSpans} from '../common/TrendingDialog';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
 const URL = 'https://github.com/trending/';
 
 export default class TrendingPage extends Component {
@@ -20,6 +25,7 @@ export default class TrendingPage extends Component {
     super(props);
     this.state = {
       topTabs: ['JavaScript', 'PHP', 'C', 'C++', 'java', 'Node'],
+      timeSpan: TimeSpans[0],
     };
   }
   handleForEachTopTabs() {
@@ -27,7 +33,13 @@ export default class TrendingPage extends Component {
     let {topTabs} = this.state;
     topTabs.forEach((item, index) => {
       tabList[`TrendingTab${index}`] = {
-        screen: props => <TrendingTabPage {...props} tabLable={item} />,
+        screen: props => (
+          <TrendingTabPage
+            {...props}
+            tabLable={item}
+            timeSpan={this.state.timeSpan}
+          />
+        ),
         navigationOptions: {
           tabBarLabel: item,
         },
@@ -37,25 +49,71 @@ export default class TrendingPage extends Component {
     return tabList;
   }
   handelTabNavigation() {
-    return createAppContainer(
-      createMaterialTopTabNavigator(this.handleForEachTopTabs(), {
-        tabBarOptions: {
-          upperCaseLabel: false,
-          scrollEnabled: true,
-          style: styles.tabHurdle,
-          tabStyle: styles.tabStyle,
-          indicatorStyle: styles.indicatorStyle,
-          labelStyle: styles.labelStyle,
-        },
-      }),
+    if (!this.tab) {
+      this.tab = createAppContainer(
+        createMaterialTopTabNavigator(this.handleForEachTopTabs(), {
+          tabBarOptions: {
+            upperCaseLabel: false,
+            scrollEnabled: true,
+            style: styles.tabHurdle,
+            tabStyle: styles.tabStyle,
+            indicatorStyle: styles.indicatorStyle,
+            labelStyle: styles.labelStyle,
+          },
+        }),
+      );
+    }
+    return this.tab;
+  }
+  renderTitleView() {
+    return (
+      <View>
+        <TouchableOpacity
+          underlayColor="transparent"
+          onPress={() => this.dialog.show()}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleConText}>
+              趋势 {this.state.timeSpan.showText}
+            </Text>
+            <MaterialIcons
+              name={'arrow-drop-down'}
+              size={22}
+              style={styles.iconColor}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+  onSelectTimeSpan(timeSpan) {
+    this.dialog.dismiss();
+    this.setState(
+      {
+        timeSpan,
+      },
+      () => {
+        DeviceEventEmitter.emit('EVENT_TYPE_TIME_SPAN_CHANGE', timeSpan);
+      },
+    );
+  }
+  onCloseTimeSpan() {}
+  renderTrendingPage() {
+    return (
+      <TrendingDialog
+        ref={dialog => (this.dialog = dialog)}
+        onSelect={timeSpan => this.onSelectTimeSpan(timeSpan)}
+        onClose={() => this.onCloseTimeSpan()}
+      />
     );
   }
   render() {
     let TabNavigation = this.handelTabNavigation();
+    let navigationBar = <NavigationBar titleView={this.renderTitleView()} />;
     return (
       <View style={styles.wrapper}>
-        <NavigationBar title={'最热'} />
+        {navigationBar}
         <TabNavigation />
+        {this.renderTrendingPage()}
       </View>
     );
   }
@@ -65,10 +123,19 @@ const pageSize = 10;
 class TrendingTab extends Component {
   constructor(props) {
     super(props);
-    this.storeName = this.props.tabLable;
+    let {tabLable, timeSpan} = this.props;
+    this.storeName = tabLable;
+    this.timeSpan = timeSpan;
   }
   componentDidMount() {
     this.loadData();
+    this.EventEmitterLoadData();
+  }
+  EventEmitterLoadData() {
+    DeviceEventEmitter.addListener(EVENT_TYPE_TIME_SPAN_CHANGE, timeSpan => {
+      this.timeSpan = timeSpan;
+      this.loadData();
+    });
   }
   _store() {
     const {trending} = this.props;
@@ -79,7 +146,7 @@ class TrendingTab extends Component {
         items: [],
         isLoading: false,
         projectModels: [],
-        hideLoadingMore: true,
+        hideLoadingMore: false,
       };
     }
     return store;
@@ -113,7 +180,7 @@ class TrendingTab extends Component {
     );
   }
   genFetchUrl(key) {
-    return URL + key + '?since=weekly';
+    return URL + key + '?' + this.timeSpan.searchText;
   }
   render() {
     let store = this._store();
@@ -212,4 +279,14 @@ const styles = StyleSheet.create({
     color: 'red',
     margin: 10,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleConText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    fontWeight: '400',
+  },
+  iconColor: {color: 'white'},
 });

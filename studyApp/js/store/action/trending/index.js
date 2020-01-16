@@ -74,12 +74,14 @@ export function onLoadMoreTrending(
           storeName,
           pageIndex: --pageIndex,
         });
+        // console.log('TRENDING_LOAD_MORE_FAIL');
       } else {
         let max =
           pageSize * pageIndex > dataArray.length
             ? dataArray
             : pageSize * pageIndex;
         let projectModels = dataArray.slice(0, max);
+        console.log(projectModels, 'SUCCESS');
         dispatch({
           type: TRENDING_LOAD_MORE_SUCCESS,
           storeName,
@@ -87,6 +89,6 @@ export function onLoadMoreTrending(
           projectModels,
         });
       }
-    }, 500);
+    }, 300);
   };
 }

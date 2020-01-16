@@ -7,8 +7,10 @@ import {
   View,
   Platform,
   DeviceInfo,
-  ImageBackground,
 } from 'react-native';
+//Platform模块用于区分移动设备的操作系统及api版本
+//
+
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TimeSpan from '../model/TimeSpan';
 export const TimeSpans = [
@@ -45,10 +47,12 @@ export default class TrendingDialog extends Component {
     let {onClose, onSelect} = this.props;
     return (
       <Modal
-        visible={this.props.visible}
+        visible={this.state.visible}
         transparent={true}
-        animationType={'slide'}
-        onRequestClose={onClose()}>
+        onRequestClose={() => {
+          onClose();
+          this.dismiss();
+        }}>
         <TouchableOpacity
           style={styles.container}
           onPress={() => this.dismiss()}>
@@ -58,7 +62,23 @@ export default class TrendingDialog extends Component {
             style={styles.arrow}
           />
 
-          
+          <View style={{backgroundColor: '#fff'}}>
+            {TimeSpans.map((result, i, arr) => {
+              return (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => onSelect(arr[i])}
+                  underlayColor={'transparent'}>
+                  <View style={styles.text_container}>
+                    <Text style={styles.text}>{arr[i].showText}</Text>
+                  </View>
+                  {i !== TimeSpans.length - 1 ? (
+                    <View style={styles.line} />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </TouchableOpacity>
       </Modal>
     );
@@ -76,5 +96,21 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 0,
     margin: -15,
+  },
+  text_container: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  text: {
+    fontSize: 16,
+    color: 'black',
+    fontWeight: '400',
+    padding: 8,
+    paddingLeft: 26,
+    paddingRight: 26,
+  },
+  line: {
+    height: 0.3,
+    backgroundColor: 'darkgray',
   },
 });

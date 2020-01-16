@@ -10,7 +10,7 @@ export default class WelcomePage extends Component {
           navigation: this.props.navigation,
         },
       });
-    }, 2000);
+    }, 200);
   }
   componentWillUnmount() {
     clearTimeout(this.timeId);

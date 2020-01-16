@@ -1,9 +1,14 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import NavigationUtil from '../navigation/navigationUtil';
 
 export default class TrendingItem extends Component {
-  onItemClick() {}
+  onItemClick(item) {
+    NavigationUtil.goPage('DetailPage', {
+      projectModels: item,
+    });
+  }
   _favoriteIcon() {
     const {theme} = this.props;
     return (
@@ -14,12 +19,10 @@ export default class TrendingItem extends Component {
   }
   render() {
     const {projectModel} = this.props;
-    console.log(projectModel);
     const {item} = projectModel;
-    const {TrendingRepoModel} = item;
     if (!item) return null;
     return (
-      <TouchableOpacity onPress={() => this.onItemClick()}>
+      <TouchableOpacity onPress={() => this.onItemClick(item)}>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.full_name}</Text>
           <Text style={styles.description}>{item.meta}</Text>
