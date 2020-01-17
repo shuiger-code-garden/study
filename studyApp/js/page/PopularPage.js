@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import actions from '../store/action';
 import PopularItem from '../common/PopularItem';
 import NavigationBar from '../common/NavigationBar';
+import NavigationUtil from '../navigation/navigationUtil';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 
@@ -103,7 +104,17 @@ class PopularTab extends Component {
   }
   renderItem(item) {
     const {theme} = this.props;
-    return <PopularItem projectModel={item} theme={theme} />;
+    return (
+      <PopularItem
+        projectModel={item}
+        theme={theme}
+        onPress={items =>
+          NavigationUtil.goPage('DetailPage', {
+            projectModels: items,
+          })
+        }
+      />
+    );
   }
   genIndicator() {
     return this._store().hideLoadingMore ? null : (

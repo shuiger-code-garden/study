@@ -20,7 +20,7 @@ export default class BackHandlerComponent {
         this._onHardwareBackPress,
       );
   }
-  componentWillMount() {
+  componentWillUnmount() {
     //componentWillMount 移除安卓返回监听机制
     if (this.props.backPress)
       BackHandler.removeEventListener(
@@ -29,6 +29,6 @@ export default class BackHandlerComponent {
       );
   }
   onHardwareBackPress(e) {
-    this.props.backPress(e);
+    return this.props.backPress(e);
   }
 }

@@ -1,14 +1,10 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import NavigationUtil from '../navigation/navigationUtil';
+
 
 export default class PopularItem extends Component {
-  onItemClick(item) {
-    NavigationUtil.goPage('DetailPage', {
-      projectModels: item,
-    });
-  }
+
   _favoriteIcon() {
     const {theme} = this.props;
     return (
@@ -23,7 +19,7 @@ export default class PopularItem extends Component {
     if (!item || !item.owner) return null;
 
     return (
-      <TouchableOpacity onPress={() => this.onItemClick(item)}>
+      <TouchableOpacity onPress={() => this.props.onPress(item)}>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.full_name}</Text>
           <Text style={styles.description}>{item.description}</Text>

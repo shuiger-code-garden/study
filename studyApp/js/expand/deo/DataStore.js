@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import GitHubTrending from 'GitHubTrending';
+import Storage from '../storage';
 
 export const FLAG_STORAGE = {
   flag_popular: 'popular',
@@ -99,7 +100,7 @@ export default class DataStore {
             if (!items) {
               throw new Error('responseData is null');
             }
-            this.saveData(url, flag);
+            this.saveData(url, items);
             resolve(items);
           })
           .catch(error => {

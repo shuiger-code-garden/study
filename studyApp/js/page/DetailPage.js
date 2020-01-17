@@ -12,15 +12,13 @@ const THEME_COLOR = '#678';
 /**
  * 通过 webView onNavigationStateChange 监听路由变化进行回调
  * 判断canGoBack 能否返回webview页面还是原生页面
- * 
+ *
  */
 
 export default class DetailPage extends Component {
   constructor(props) {
     super(props);
-    this.backPress = new BackPressComponent({
-      backPress: () => this.onGoBack(),
-    });
+
     this.params = this.props.navigation.state.params;
     let {projectModels} = this.params;
     this.url =
@@ -31,12 +29,19 @@ export default class DetailPage extends Component {
       url: this.url,
       canGoBack: false,
     };
+    this.backPress = new BackPressComponent({
+      backPress: () => this.onBackPress(),
+    });
   }
   componentDidMount() {
     this.backPress.componentDidMount();
   }
-  componentWillMount() {
-    this.backPress.componentWillMount();
+  componentWillUnmount() {
+    this.backPress.componentWillUnmount();
+  }
+  onBackPress() {
+    this.onGoBack();
+    return true;
   }
   onGoBack() {
     if (this.state.canGoBack) {
@@ -63,9 +68,9 @@ export default class DetailPage extends Component {
       </View>
     );
   }
-  onNavigationStateChange(e) {
+  onNavigationStateChange(navState) {
     this.setState({
-      canGoBack: e.canGoBack,
+      canGoBack: navState.canGoBack,
     });
   }
   render() {

@@ -17,6 +17,7 @@ import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
 import TrendingDialog, {TimeSpans} from '../common/TrendingDialog';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import NavigationUtil from '../navigation/navigationUtil';
 const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
 const URL = 'https://github.com/trending/';
 
@@ -169,7 +170,17 @@ class TrendingTab extends Component {
   }
   renderItem(item) {
     const {theme} = this.props;
-    return <TrendingItem projectModel={item} theme={theme} />;
+    return (
+      <TrendingItem
+        projectModel={item}
+        theme={theme}
+        onPress={items => {
+          NavigationUtil.goPage('DetailPage', {
+            projectModels: items,
+          });
+        }}
+      />
+    );
   }
   genIndicator() {
     return this._store().hideLoadingMore ? null : (
@@ -190,7 +201,7 @@ class TrendingTab extends Component {
         <FlatList
           data={store.projectModels}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => `${item.fullName}`}
+          keyExtractor={(item, index) => item.fullName || index}
           refreshControl={
             <RefreshControl
               title={'Loading'}
