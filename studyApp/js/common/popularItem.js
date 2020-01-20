@@ -1,18 +1,8 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import BaseItem from './BaseItem';
 
-
-export default class PopularItem extends Component {
-
-  _favoriteIcon() {
-    const {theme} = this.props;
-    return (
-      <TouchableOpacity style={{padding: 6}} underlayColor="transparent">
-        <FontAwesome name={'star-o'} size={26} style={{color: theme}} />
-      </TouchableOpacity>
-    );
-  }
+export default class PopularItem extends BaseItem {
   render() {
     const {projectModel} = this.props;
     const {item} = projectModel;

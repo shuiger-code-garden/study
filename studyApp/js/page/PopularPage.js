@@ -14,12 +14,16 @@ import actions from '../store/action';
 import PopularItem from '../common/PopularItem';
 import NavigationBar from '../common/NavigationBar';
 import NavigationUtil from '../navigation/navigationUtil';
+import FavoriteDao from '../expand/deo/FavoriteDao';
+import FLAG_STORAGE from '../expand/deo/DataStore';
+import FavoriteUtil from '../util/FavoriteUtil';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 
 export default class PopularPage extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       topTabs: ['JavaScript', 'PHP', 'C', 'C++', 'java', 'Node'],
     };
@@ -67,6 +71,7 @@ const pageSize = 10;
 class PopularTab extends Component {
   constructor(props) {
     super(props);
+    this.favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
     this.storeName = this.props.tabLable;
   }
   componentDidMount() {
@@ -97,13 +102,15 @@ class PopularTab extends Component {
         pageSize,
         store.items,
         () => {},
+        this.favoriteDao,
       );
     } else {
-      onRefreshPopular(this.storeName, url, 10);
+      onRefreshPopular(this.storeName, url, pageSize, this.favoriteDao);
     }
   }
   renderItem(item) {
-    const {theme} = this.props;
+    // const {theme} = this.props;
+    console.log(item, '>>>>');
     return (
       <PopularItem
         projectModel={item}
@@ -113,6 +120,14 @@ class PopularTab extends Component {
             projectModels: items,
           })
         }
+        onFavorite={(item, isFavorite) => {
+          FavoriteUtil.onFavorite(
+            this.favoriteDao,
+            item,
+            isFavorite,
+            FLAG_STORAGE.flag_popular,
+          );
+        }}
       />
     );
   }
@@ -135,7 +150,6 @@ class PopularTab extends Component {
         <FlatList
           data={store.projectModels}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => '' + item.id}
           refreshControl={
             <RefreshControl
               title={'Loading'}
@@ -174,10 +188,17 @@ const mapPopularStateToProps = state => ({
 });
 
 const mapPopularActionToProps = dispatch => ({
-  onRefreshPopular: (storeName, url, pageSize) => {
-    dispatch(actions.onRefreshPopular(storeName, url, pageSize));
+  onRefreshPopular: (storeName, url, pageSize, favoriteDao) => {
+    dispatch(actions.onRefreshPopular(storeName, url, pageSize, favoriteDao));
   },
-  onLoadMorePopular: (storeName, pageIndex, pageSize, dataArray, callback) => {
+  onLoadMorePopular: (
+    storeName,
+    pageIndex,
+    pageSize,
+    dataArray,
+    callback,
+    favoriteDao,
+  ) => {
     dispatch(
       actions.onLoadMorePopular(
         storeName,
@@ -185,6 +206,7 @@ const mapPopularActionToProps = dispatch => ({
         pageSize,
         dataArray,
         callback,
+        favoriteDao,
       ),
     );
   },

@@ -1,16 +1,26 @@
+import {ProjectModel} from '../../model/projectModel';
+import Util from '../../util/Utils';
 /**
  *
- * 数据处理成功
+ *
  * @export
  * @param {*} actionType
  * @param {*} dispatch
- * @param {*} storName
+ * @param {*} storeName
  * @param {*} data
  * @param {*} pageSize
+ * @param {*} favoriteDao
  */
-export function handleData(actionType, dispatch, storeName, data, pageSize) {
+export function handleData(
+  actionType,
+  dispatch,
+  storeName,
+  data,
+  pageSize,
+  favoriteDao,
+) {
   let fixItems = [];
-  
+
   if (data && data.data) {
     if (Array.isArray(data.data)) {
       fixItems = data.data;
@@ -18,14 +28,46 @@ export function handleData(actionType, dispatch, storeName, data, pageSize) {
       fixItems = data.data.items;
     }
   }
-  let projectModels =
+  let showItems =
     pageSize > fixItems.length ? fixItems : fixItems.slice(0, pageSize);
-
-  dispatch({
-    type: actionType,
-    storeName,
-    projectModels,
-    items: fixItems,
-    pageIndex: 1,
+  // _projectModels是异步函数需要借助回调函数
+  _projectModels(showItems, favoriteDao, projectModels => {
+    dispatch({
+      type: actionType,
+      storeName: storeName,
+      projectModels: projectModels,
+      items: fixItems,
+      pageIndex: 1,
+    });
   });
+}
+
+/**
+ *
+ * 检查项目是否被收藏，进行封装
+ * @export
+ * @param {*} showItems
+ * @param {*} favoriteDao
+ * @param {*} callback
+ */
+export async function _projectModels(showItems, favoriteDao, callback) {
+  let keys = [];
+  try {
+    keys = await favoriteDao.getFavoriteKeys();
+  } catch (error) {
+    console.log(error);
+  }
+  let projectModels = [];
+  for (let i = 0, len = showItems.length; i < len; ++i) {
+    projectModels.push(
+      new ProjectModel(showItems[i], Util.checkFavorite(showItems[i], keys)),
+    );
+  }
+  doCallback(projectModels, callback);
+}
+
+export function doCallback(projectModels, callback) {
+  if (typeof callback === 'function') {
+    callback(projectModels);
+  }
 }

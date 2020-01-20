@@ -6,7 +6,7 @@ import {
   TRENDING_LOAD_MORE_FAIL,
 } from '../types';
 import DataStore, {FLAG_STORAGE} from '../../../expand/deo/DataStore';
-import {handleData} from '../actionUtil';
+import {handleData} from '../ActionUtil';
 
 /**
  *获取最热数据的异步action
