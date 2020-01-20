@@ -15,15 +15,15 @@ import PopularItem from '../common/PopularItem';
 import NavigationBar from '../common/NavigationBar';
 import NavigationUtil from '../navigation/navigationUtil';
 import FavoriteDao from '../expand/deo/FavoriteDao';
-import FLAG_STORAGE from '../expand/deo/DataStore';
+import {FLAG_STORAGE} from '../expand/deo/DataStore';
 import FavoriteUtil from '../util/FavoriteUtil';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
 export default class PopularPage extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       topTabs: ['JavaScript', 'PHP', 'C', 'C++', 'java', 'Node'],
     };
@@ -71,7 +71,7 @@ const pageSize = 10;
 class PopularTab extends Component {
   constructor(props) {
     super(props);
-    this.favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
+
     this.storeName = this.props.tabLable;
   }
   componentDidMount() {
@@ -102,18 +102,17 @@ class PopularTab extends Component {
         pageSize,
         store.items,
         () => {},
-        this.favoriteDao,
+        favoriteDao,
       );
     } else {
-      onRefreshPopular(this.storeName, url, pageSize, this.favoriteDao);
+      onRefreshPopular(this.storeName, url, pageSize, favoriteDao);
     }
   }
   renderItem(item) {
-    // const {theme} = this.props;
-    console.log(item, '>>>>');
+    const {theme} = this.props;
     return (
       <PopularItem
-        projectModel={item}
+        projectModel={item.item}
         theme={theme}
         onPress={items =>
           NavigationUtil.goPage('DetailPage', {
@@ -122,7 +121,7 @@ class PopularTab extends Component {
         }
         onFavorite={(item, isFavorite) => {
           FavoriteUtil.onFavorite(
-            this.favoriteDao,
+            favoriteDao,
             item,
             isFavorite,
             FLAG_STORAGE.flag_popular,
@@ -150,6 +149,7 @@ class PopularTab extends Component {
         <FlatList
           data={store.projectModels}
           renderItem={data => this.renderItem(data)}
+          keyExtractor={item => item.item.id}
           refreshControl={
             <RefreshControl
               title={'Loading'}

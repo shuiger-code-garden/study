@@ -10,6 +10,7 @@ const FAVORITE_KEY_PREFIX = 'favorite_';
 export default class FavoriteDao {
   constructor(flag) {
     this.favoritekey = FAVORITE_KEY_PREFIX + flag;
+    console.log(this.favoritekey);
   }
   /**
    *
@@ -58,8 +59,9 @@ export default class FavoriteDao {
    * @memberof FavoriteDao
    */
   getFavoriteKeys() {
+    debugger;
     return new Promise((resolve, reject) => {
-      AsyncStorage.getItem(this.favoriteKey, (error, result) => {
+      AsyncStorage.getItem(this.favoritekey, (error, result) => {
         if (!error) {
           try {
             resolve(JSON.parse(result));

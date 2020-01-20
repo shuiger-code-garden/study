@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import GitHubTrending from 'GitHubTrending';
-import Storage from '../storage';
+
 
 export const FLAG_STORAGE = {
   flag_popular: 'popular',

@@ -65,7 +65,13 @@ export async function _projectModels(showItems, favoriteDao, callback) {
   }
   doCallback(projectModels, callback);
 }
-
+/**
+ *
+ *
+ * @export
+ * @param {*} projectModels
+ * @param {*} callback
+ */
 export function doCallback(projectModels, callback) {
   if (typeof callback === 'function') {
     callback(projectModels);
