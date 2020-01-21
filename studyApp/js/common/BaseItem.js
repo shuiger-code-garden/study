@@ -15,7 +15,15 @@ export default class BaseItem extends Component {
       isFavorite: this.props.projectModel.isFavorite,
     };
   }
-
+  /**
+   * 通过props 改变更新state
+   *
+   * @static
+   * @param {*} nextProps
+   * @param {*} prevState
+   * @returns
+   * @memberof BaseItem
+   */
   static getDerivedStateFromProps(nextProps, prevState) {
     const isFavorite = nextProps.projectModel.isFavorite;
     if (prevState.isFavorite !== isFavorite) {
@@ -44,7 +52,7 @@ export default class BaseItem extends Component {
    */
   onPressFavorite() {
     this.setFavoriteState(!this.state.isFavorite);
-    this.onFavorite(this.props.projectModel.item, !this.state.isFavorite);
+    this.props.onFavorite(this.props.projectModel.item, !this.state.isFavorite);
   }
   _favoriteIcon() {
     const {theme} = this.props;

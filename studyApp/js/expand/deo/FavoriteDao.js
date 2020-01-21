@@ -2,6 +2,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 const FAVORITE_KEY_PREFIX = 'favorite_';
 
 /**
+ *  通过favoritekey 区分不同页面的项目收藏
+ *  saveFavoriteItem -》 收藏项目
+ *  updateFavoriteKeys 通过 favoritekey 管理 不同页面的收藏项目的key
+ *  getFavoriteKeys 通过 favoritekey 获取不同页面的收藏项目的key
+ *
+ */
+
+/**
  *保存项目数据处理层
  *
  * @export
@@ -10,7 +18,6 @@ const FAVORITE_KEY_PREFIX = 'favorite_';
 export default class FavoriteDao {
   constructor(flag) {
     this.favoritekey = FAVORITE_KEY_PREFIX + flag;
-    console.log(this.favoritekey);
   }
   /**
    *
@@ -21,7 +28,7 @@ export default class FavoriteDao {
    * @memberof FavoriteDao
    */
   saveFavoriteItem(key, value, callback) {
-    AsyncStorage.setItem(key, value, (error, result) => {
+    AsyncStorage.setItem(key, JSON.stringify(value), (error, result) => {
       if (!error) {
         this.updateFavoriteKeys(key, true);
       }
@@ -54,12 +61,11 @@ export default class FavoriteDao {
     });
   }
   /**
-   * 获取收藏的Repository对应的key
+   * 获取收藏的Repository对应的keys列表
    *
    * @memberof FavoriteDao
    */
   getFavoriteKeys() {
-    debugger;
     return new Promise((resolve, reject) => {
       AsyncStorage.getItem(this.favoritekey, (error, result) => {
         if (!error) {

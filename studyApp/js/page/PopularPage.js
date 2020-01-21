@@ -114,11 +114,14 @@ class PopularTab extends Component {
       <PopularItem
         projectModel={item.item}
         theme={theme}
-        onPress={items =>
+        onSelect={callback => {
           NavigationUtil.goPage('DetailPage', {
-            projectModels: items,
-          })
-        }
+            projectModels: item.item,
+            flag: FLAG_STORAGE.flag_popular,
+            callback,
+          });
+        }}
+        //收藏项目或取消项目
         onFavorite={(item, isFavorite) => {
           FavoriteUtil.onFavorite(
             favoriteDao,
@@ -149,7 +152,7 @@ class PopularTab extends Component {
         <FlatList
           data={store.projectModels}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => item.item.id}
+          keyExtractor={item => `${item.item.id}`}
           refreshControl={
             <RefreshControl
               title={'Loading'}

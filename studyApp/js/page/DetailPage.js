@@ -18,12 +18,12 @@ const THEME_COLOR = '#678';
 export default class DetailPage extends Component {
   constructor(props) {
     super(props);
-
     this.params = this.props.navigation.state.params;
     let {projectModels} = this.params;
+    let projectModel = projectModels.item;
     this.url =
-      projectModels.html_url || `${TRENDING_URL}${projectModels.fullName}`;
-    const title = projectModels.full_name || projectModels.fullName;
+      projectModel.html_url || `${TRENDING_URL}${projectModel.fullName}`;
+    const title = projectModel.full_name || projectModel.fullName;
     this.state = {
       title: title,
       url: this.url,

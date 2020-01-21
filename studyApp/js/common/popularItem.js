@@ -9,7 +9,7 @@ export default class PopularItem extends BaseItem {
     if (!item || !item.owner) return null;
 
     return (
-      <TouchableOpacity onPress={() => this.props.onPress(item)}>
+      <TouchableOpacity onPress={() => this.onItemClick()}>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.full_name}</Text>
           <Text style={styles.description}>{item.description}</Text>
