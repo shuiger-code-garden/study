@@ -6,6 +6,7 @@ import NavigationBar from '../common/NavigationBar';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import NavigationUtil from '../navigation/navigationUtil';
 import BackPressComponent from '../common/BackPressComponent';
+import FavoriteDao from '../expand/deo/FavoriteDao';
 const TRENDING_URL = 'https://github.com/';
 const THEME_COLOR = '#678';
 
@@ -19,7 +20,8 @@ export default class DetailPage extends Component {
   constructor(props) {
     super(props);
     this.params = this.props.navigation.state.params;
-    let {projectModels} = this.params;
+    let {projectModels, flag} = this.params;
+    this.favoriteDao = new FavoriteDao(flag);
     let projectModel = projectModels.item;
     this.url =
       projectModel.html_url || `${TRENDING_URL}${projectModel.fullName}`;
@@ -28,6 +30,7 @@ export default class DetailPage extends Component {
       title: title,
       url: this.url,
       canGoBack: false,
+      isFavorite: projectModels.isFavorite,
     };
     this.backPress = new BackPressComponent({
       backPress: () => this.onBackPress(),
@@ -54,12 +57,31 @@ export default class DetailPage extends Component {
       });
     }
   }
+  onFavoriteButtonClick() {
+    const {projectModels, callback} = this.params;
+    const isFavorite = (projectModels.isFavorite = !projectModels.isFavorite);
+    callback(isFavorite);
+    this.setState({
+      isFavorite: isFavorite,
+    });
+    let key = projectModels.item.fullName
+      ? projectModels.item.fullName
+      : projectModels.item.id.toString();
+    if (projectModels.isFavorite) {
+      this.favoriteDao.saveFavoriteItem(
+        key,
+        JSON.stringify(projectModels.item),
+      );
+    } else {
+      this.favoriteDao.removeFavoriteItem(key);
+    }
+  }
   renderRightButton() {
     return (
       <View style={styles.rightBtn}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => this.onFavoriteButtonClick()}>
           <FontAwesome
-            name={'star-o'}
+            name={this.state.isFavorite ? 'star' : 'star-o'}
             size={20}
             style={styles.renderRightBtn}
           />

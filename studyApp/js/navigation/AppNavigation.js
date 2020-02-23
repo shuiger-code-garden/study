@@ -9,6 +9,9 @@ import {
 import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
 import WelcomePage from '../page/WelcomePage';
+import WebViewPage from '../page/WebViewPage';
+import AboutPage from '../page/about/AboutPage';
+import AboutMePage from '../page/about/AboutMePage';
 
 /**
  *  启动页面路由
@@ -34,6 +37,24 @@ const mainNavigation = createStackNavigator({
   },
   DetailPage: {
     screen: DetailPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  WebViewPage: {
+    screen: WebViewPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  AboutPage: {
+    screen: AboutPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  AboutMePage: {
+    screen: AboutMePage,
     navigationOptions: {
       header: null,
     },

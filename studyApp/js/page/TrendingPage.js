@@ -132,11 +132,17 @@ class TrendingTab extends Component {
     this.loadData();
     this.EventEmitterLoadData();
   }
+  componentWillUnmount() {
+    this.listener.remove();
+  }
   EventEmitterLoadData() {
-    DeviceEventEmitter.addListener(EVENT_TYPE_TIME_SPAN_CHANGE, timeSpan => {
-      this.timeSpan = timeSpan;
-      this.loadData();
-    });
+    this.listener = DeviceEventEmitter.addListener(
+      EVENT_TYPE_TIME_SPAN_CHANGE,
+      timeSpan => {
+        this.timeSpan = timeSpan;
+        this.loadData();
+      },
+    );
   }
   _store() {
     const {trending} = this.props;

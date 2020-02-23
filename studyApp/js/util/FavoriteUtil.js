@@ -2,7 +2,7 @@ import FLAG_STORAGE from '../expand/deo/DataStore';
 
 export default class FavoriteUtil {
   /**
-   * favoriteIcon单击回调函数
+   * favoriteIcon 改变缓存收藏状态
    * @param favoriteDao
    * @param item
    * @param isFavorite

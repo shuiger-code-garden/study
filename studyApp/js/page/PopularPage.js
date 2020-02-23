@@ -17,6 +17,8 @@ import NavigationUtil from '../navigation/navigationUtil';
 import FavoriteDao from '../expand/deo/FavoriteDao';
 import {FLAG_STORAGE} from '../expand/deo/DataStore';
 import FavoriteUtil from '../util/FavoriteUtil';
+import EventBus from 'react-native-event-bus';
+import EventTypes from '../util/EventBusTypes';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
@@ -76,6 +78,23 @@ class PopularTab extends Component {
   }
   componentDidMount() {
     this.loadData();
+    EventBus.getInstance().addListener(
+      EventTypes.favorite_changed_popular,
+      (this.favoriteChangedPopular = () => {
+        this.isFavoriteChanged = true;
+      }),
+    );
+    EventBus.getInstance().addListener(
+      EventTypes.bottom_tab_select,
+      (this.bottomTabSelect = data => {
+        if (data.to === 0 && this.isFavoriteChanged) {
+          this.loadData(null, true);
+        }
+      }),
+    );
+  }
+  componentWillUnmount() {
+    EventBus.getInstance().removeListener(this.favoriteChangedPopular);
   }
   _store() {
     const {popular} = this.props;
@@ -91,8 +110,12 @@ class PopularTab extends Component {
     }
     return store;
   }
-  loadData(loadMore) {
-    const {onRefreshPopular, onLoadMorePopular} = this.props;
+  loadData(loadMore, refreshFavorite) {
+    const {
+      onRefreshPopular,
+      onLoadMorePopular,
+      onFlushPopularFavorite,
+    } = this.props;
     const store = this._store();
     const url = this.genFetchUrl(this.storeName);
     if (loadMore) {
@@ -104,19 +127,27 @@ class PopularTab extends Component {
         () => {},
         favoriteDao,
       );
+    } else if (refreshFavorite) {
+      onFlushPopularFavorite(
+        this.storeName,
+        store.pageIndex,
+        pageSize,
+        store.items,
+        favoriteDao,
+      );
     } else {
       onRefreshPopular(this.storeName, url, pageSize, favoriteDao);
     }
   }
-  renderItem(item) {
+  renderItem(items) {
     const {theme} = this.props;
     return (
       <PopularItem
-        projectModel={item.item}
+        projectModel={items.item}
         theme={theme}
         onSelect={callback => {
           NavigationUtil.goPage('DetailPage', {
-            projectModels: item.item,
+            projectModels: items.item,
             flag: FLAG_STORAGE.flag_popular,
             callback,
           });
@@ -193,6 +224,23 @@ const mapPopularStateToProps = state => ({
 const mapPopularActionToProps = dispatch => ({
   onRefreshPopular: (storeName, url, pageSize, favoriteDao) => {
     dispatch(actions.onRefreshPopular(storeName, url, pageSize, favoriteDao));
+  },
+  onFlushPopularFavorite: (
+    storeName,
+    pageIndex,
+    pageSize,
+    dataArray,
+    favoriteDao,
+  ) => {
+    dispatch(
+      actions.onFlushPopularFavorite(
+        storeName,
+        pageIndex,
+        pageSize,
+        dataArray,
+        favoriteDao,
+      ),
+    );
   },
   onLoadMorePopular: (
     storeName,

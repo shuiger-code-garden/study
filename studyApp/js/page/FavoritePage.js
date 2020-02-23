@@ -1,43 +1,41 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
+import {StyleSheet, View, Text, FlatList, RefreshControl} from 'react-native';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
 import {connect} from 'react-redux';
 import actions from '../store/action';
 import PopularItem from '../common/PopularItem';
+import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
 import NavigationUtil from '../navigation/navigationUtil';
 import FavoriteDao from '../expand/deo/FavoriteDao';
 import {FLAG_STORAGE} from '../expand/deo/DataStore';
+import EventBus from 'react-native-event-bus';
 import FavoriteUtil from '../util/FavoriteUtil';
-const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
+import EventBusTypes from '../util/EventBusTypes';
 
 export default class FavoritePage extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      topTabs: [],
-    };
   }
-  handelTabNavigation() {
-    return createAppContainer(
+  render() {
+    let navigationBar = <NavigationBar title={'收藏'} />;
+    const TabNavigator = createAppContainer(
       createMaterialTopTabNavigator(
         {
           FavoriteTab1: {
-            screen: props => <FavoriteTabPage {...props} />,
+            flag_popular: 'popular',
+            screen: props => (
+              <FavoriteTabPage {...props} flag={FLAG_STORAGE.flag_popular} />
+            ),
             navigationOptions: {
               tabBarLabel: '最热',
             },
           },
           FavoriteTab2: {
-            screen: props => <FavoriteTabPage {...props} />,
+            screen: props => (
+              <FavoriteTabPage flag={FLAG_STORAGE.flag_trending} {...props} />
+            ),
             navigationOptions: {
               tabBarLabel: '趋势',
             },
@@ -54,89 +52,83 @@ export default class FavoritePage extends Component {
         },
       ),
     );
-  }
-  render() {
-    let TabNavigation = this.handelTabNavigation();
     return (
       <View style={styles.wrapper}>
-        <NavigationBar title={'收藏'} />
-        <TabNavigation />
+        {navigationBar}
+        <TabNavigator />
       </View>
     );
   }
 }
 
-const pageSize = 10;
 class FavoriteTab extends Component {
   constructor(props) {
     super(props);
-    this.storeName = this.props.tabLable;
+    const {flag} = this.props;
+    this.storeName = flag;
+    this.favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
   }
   componentDidMount() {
-    this.loadData();
+    this.loadData(true);
+    EventBus.getInstance().addListener(
+      EventBusTypes.bottom_tab_select,
+      (this.bottomTabSelect = data => {
+        if (data.to === 2) {
+          this.loadData(false);
+        }
+      }),
+    );
   }
+  /**
+   * 获取与当前页面有关的数据
+   *
+   * @returns
+   * @memberof FavoriteTab
+   */
   _store() {
-    const {popular} = this.props;
-    let store = popular[this.storeName];
+    const {favorite} = this.props;
+    let store = favorite[this.storeName];
     if (!store) {
       //设置默认数据
       store = {
         items: [],
         isLoading: false,
         projectModels: [],
-        hideLoadingMore: true,
       };
     }
     return store;
   }
-  loadData(loadMore) {
-    const {onRefreshPopular, onLoadMorePopular} = this.props;
-    const store = this._store();
-    const url = this.genFetchUrl(this.storeName);
-    if (loadMore) {
-      onLoadMorePopular(
-        this.storeName,
-        store.pageIndex,
-        pageSize,
-        store.items,
-        () => {},
-        favoriteDao,
-      );
+  loadData(isShowLoading) {
+    const {onLoadFavoriteData} = this.props;
+    onLoadFavoriteData(this.storeName, isShowLoading);
+  }
+  onFavorite(item, isFavorite) {
+    FavoriteUtil.onFavorite(this.favoriteDao, item, isFavorite, this.storeName);
+    //触发事件
+    if (this.storeName === FLAG_STORAGE.flag_popular) {
+      EventBus.getInstance().fireEvent(EventBusTypes.favorite_changed_popular);
     } else {
-      onRefreshPopular(this.storeName, url, pageSize, favoriteDao);
+      EventBus.getInstance().fireEvent(EventBusTypes.favorite_changed_trending);
     }
   }
-  renderItem(item) {
+  renderItem(data) {
     const {theme} = this.props;
+    const item = data.item;
+    const Item =
+      this.storeName === FLAG_STORAGE.flag_popular ? PopularItem : TrendingItem;
     return (
-      <PopularItem
-        projectModel={item.item}
+      <Item
         theme={theme}
+        projectModel={item}
         onSelect={callback => {
           NavigationUtil.goPage('DetailPage', {
-            projectModels: item.item,
-            flag: FLAG_STORAGE.flag_popular,
+            projectModels: item,
+            flag: this.storeName,
             callback,
           });
         }}
-        //收藏项目或取消项目
-        onFavorite={(item, isFavorite) => {
-          FavoriteUtil.onFavorite(
-            favoriteDao,
-            item,
-            isFavorite,
-            FLAG_STORAGE.flag_popular,
-          );
-        }}
+        onFavorite={(item, isFavorite) => this.onFavorite(item, isFavorite)}
       />
-    );
-  }
-  genIndicator() {
-    return this._store().hideLoadingMore ? null : (
-      <View style={styles.indicatorContainer}>
-        <ActivityIndicator style={styles.indicator} />
-        <Text>正在加载更多</Text>
-      </View>
     );
   }
   render() {
@@ -154,26 +146,10 @@ class FavoriteTab extends Component {
               titleColor={theme}
               colors={[theme]}
               refreshing={store.isLoading}
-              onRefresh={() => this.loadData()}
+              onRefresh={() => this.loadData(true)}
               tintColor={theme}
             />
           }
-          ListFooterComponent={() => this.genIndicator()}
-          onEndReached={() => {
-            console.log('---onEndReached----');
-            setTimeout(() => {
-              if (this.canLoadMore) {
-                //     //fix 滚动时两次调用onEndReached https://github.com/facebook/react-native/issues/14015
-                this.loadData(true);
-                this.canLoadMore = false;
-              }
-            }, 100);
-          }}
-          onEndReachedThreshold={0.5}
-          onMomentumScrollBegin={() => {
-            this.canLoadMore = true; //fix 初始化时页调用onEndReached的问题
-            console.log('---onMomentumScrollBegin-----');
-          }}
         />
       </View>
     );
@@ -181,32 +157,13 @@ class FavoriteTab extends Component {
 }
 
 const mapPopularStateToProps = state => ({
-  popular: state.popular,
+  favorite: state.favorite,
   theme: state.theme.theme,
 });
 
 const mapPopularActionToProps = dispatch => ({
-  onRefreshPopular: (storeName, url, pageSize, favoriteDao) => {
-    dispatch(actions.onRefreshPopular(storeName, url, pageSize, favoriteDao));
-  },
-  onLoadMorePopular: (
-    storeName,
-    pageIndex,
-    pageSize,
-    dataArray,
-    callback,
-    favoriteDao,
-  ) => {
-    dispatch(
-      actions.onLoadMorePopular(
-        storeName,
-        pageIndex,
-        pageSize,
-        dataArray,
-        callback,
-        favoriteDao,
-      ),
-    );
+  onLoadFavoriteData: (flag, isShowLoading) => {
+    dispatch(actions.onLoadFavoriteData(flag, isShowLoading));
   },
 });
 

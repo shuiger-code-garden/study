@@ -8,6 +8,8 @@ import PopularPage from '../page/PopularPage';
 import TrendingPage from '../page/TrendingPage';
 import FavoritePage from '../page/FavoritePage';
 import MyPage from '../page/MyPage';
+import EventBus from 'react-native-event-bus';
+import EventBusTypes from '../util/EventBusTypes';
 
 const Tabs = {
   PopularPage: {
@@ -98,6 +100,15 @@ export default class DynamicBottomNavigation extends Component {
   }
   render() {
     let TabNavigation = this.handleRendTabNavigation();
-    return <TabNavigation />;
+    return (
+      <TabNavigation
+        onNavigationStateChange={(prevState, newState, action) => {
+          EventBus.getInstance().fireEvent(EventBusTypes.bottom_tab_select, {
+            form: prevState.index,
+            to: newState.index,
+          });
+        }}
+      />
+    );
   }
 }

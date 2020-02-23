@@ -6,6 +6,9 @@ const FAVORITE_KEY_PREFIX = 'favorite_';
  *  saveFavoriteItem -》 收藏项目
  *  updateFavoriteKeys 通过 favoritekey 管理 不同页面的收藏项目的key
  *  getFavoriteKeys 通过 favoritekey 获取不同页面的收藏项目的key
+ *  getAllItems 通过key列表获取所有的收藏项目
+ *  favoritekey => 管理不同页面的收藏项目的key列表， 通过key值列表获取对应的页面收藏项目
+ *
  *
  */
 
@@ -56,7 +59,7 @@ export default class FavoriteDao {
           if (index !== -1) favoritekeys.splice(index, 1);
         }
         //将更新后的key集合保存到本地
-        AsyncStorage.setItem(this.favoriteKey, JSON.stringify(favoritekeys));
+        AsyncStorage.setItem(this.favoritekey, JSON.stringify(favoritekeys));
       }
     });
   }

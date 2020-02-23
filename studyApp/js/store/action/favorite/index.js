@@ -3,91 +3,46 @@ import {
   FAVORITE_LOAD_FAIL,
   FAVORITE_LOAD_REFRESH,
 } from '../types';
-import {FLAG_STORAGE} from '../../../expand/deo/DataStore';
-import {handleData, _projectModels} from '../ActionUtil';
+import FavoriteDao from '../../../expand/deo/FavoriteDao';
+import {ProjectModel} from '../../../model/projectModel';
 
 /**
- *获取最热数据的异步action
+ *
  *
  * @export
- * @param {*} storeName
- * @param {*} url
- * @param {*} pageSize
+ * @param {*} flag
+ * @param {*} isShowLoading
  * @returns
  */
-export function onRefreshPopular(storeName, url, pageSize, favoriteDao) {
+export function onLoadFavoriteData(flag, isShowLoading) {
   return dispatch => {
-    dispatch({type: POPULAR_REFRESH, storeName});
-    let dataStore = new DataStore();
-    dataStore
-      .fetchData(url, FLAG_STORAGE.flag_popular)
-      .then(data => {
-        handleData(
-          POPULAR_REFRESH_SUCCESS,
-          dispatch,
-          storeName,
-          data,
-          pageSize,
-          favoriteDao,
-        );
-      })
-      .catch(error => {
-        console.log(error);
-        dispatch({
-          type: POPULAR_REFRESH_FAIL,
-          storeName,
-          error,
-        });
+    if (isShowLoading) {
+      dispatch({
+        type: FAVORITE_LOAD_REFRESH,
+        storeName: flag,
       });
-  };
-}
+    }
 
-/**
- * 上拉加载更多数据异步action
- *
- * @export
- * @param {*} storeName
- * @param {*} pageIndex
- * @param {*} pageSize
- * @param {*} [dataArray=[]]
- * @param {*} callback
- * @returns
- */
-export function onLoadMorePopular(
-  storeName,
-  pageIndex,
-  pageSize,
-  dataArray = [],
-  callback,
-  favoriteDao,
-) {
-  return dispatch => {
-    setTimeout(() => {
-      // 在获取当前页面数据之前判断上一页是否加载完所有数据
-      if ((pageIndex - 1) * pageSize >= dataArray.length) {
-        if (typeof callback === 'function') {
-          callback('no more');
+    new FavoriteDao(flag)
+      .getAllItems()
+      .then(items => {
+        let resultData = [];
+        for (let i = 0, len = items.length; i < len; i++) {
+          resultData.push(new ProjectModel(items[i], true));
         }
         dispatch({
-          error: 'no more',
-          type: POPULAR_LOAD_MORE_FAIL,
-          storeName,
-          pageIndex: --pageIndex,
+          type: FAVORITE_LOAD_SUCCESS,
+          projectModels: resultData,
+          storeName: flag,
         });
-      } else {
-        let max =
-          pageSize * pageIndex > dataArray.length
-            ? dataArray
-            : pageSize * pageIndex;
-        _projectModels(dataArray.slice(0, max), favoriteDao, projectModels => {
-          dispatch({
-            type: POPULAR_LOAD_MORE_SUCCESS,
-            storeName,
-            pageIndex: ++pageIndex,
-            projectModels,
-          });
+      })
+      .catch(e => {
+        console.log(e);
+        dispatch({
+          type: FAVORITE_LOAD_FAIL,
+          error: e,
+          storeName: flag,
         });
-      }
-    }, 300);
+      });
   };
 }

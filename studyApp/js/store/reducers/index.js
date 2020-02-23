@@ -3,6 +3,7 @@ import {RootNavigator, rootCom} from '../../navigation/AppNavigation';
 import theme from './theme';
 import popular from './popular';
 import trending from './trending';
+import favorite from './favorite';
 
 /**
  * 设置默认state
@@ -29,6 +30,7 @@ const reducers = combineReducers({
   theme: theme,
   popular: popular,
   trending: trending,
+  favorite: favorite,
 });
 
 export default reducers;

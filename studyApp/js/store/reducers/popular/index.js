@@ -4,6 +4,7 @@ import {
   POPULAR_REFRESH_SUCCESS,
   POPULAR_LOAD_MORE_SUCCESS,
   POPULAR_LOAD_MORE_FAIL,
+  FLUSH_POPULAR_FAVORITE,
 } from '../../action/types';
 
 const defaultState = {};
@@ -76,6 +77,17 @@ export default function onAction(state = defaultState, action) {
           ...state[action.storeName],
           hideLoadingMore: true,
           pageIndex: action.pageIndex,
+        },
+      };
+
+    case FLUSH_POPULAR_FAVORITE:
+      return {
+        ...state,
+        [action.storeName]: {
+          ...state[action.storeName],
+          projectModels: action.projectModels,
+          pageIndex: action.pageIndex,
+          isLoading: false,
         },
       };
 

@@ -4,6 +4,7 @@ import {
   POPULAR_REFRESH_SUCCESS,
   POPULAR_LOAD_MORE_SUCCESS,
   POPULAR_LOAD_MORE_FAIL,
+  FLUSH_POPULAR_FAVORITE,
 } from '../types';
 import DataStore, {FLAG_STORAGE} from '../../../expand/deo/DataStore';
 import {handleData, _projectModels} from '../ActionUtil';
@@ -91,5 +92,39 @@ export function onLoadMorePopular(
         });
       }
     }, 300);
+  };
+}
+
+/**
+ *
+ * 刷新收藏或取消项目
+ * @export
+ * @param {*} storeName
+ * @param {*} pageIndex
+ * @param {*} pageSize
+ * @param {*} [dataArray=[]]
+ * @param {*} favoriteDao
+ * @returns
+ */
+export function onFlushPopularFavorite(
+  storeName,
+  pageIndex,
+  pageSize,
+  dataArray = [],
+  favoriteDao,
+) {
+  return dispatch => {
+    let max =
+      pageSize * pageIndex > dataArray.length
+        ? dataArray
+        : pageSize * pageIndex;
+    _projectModels(dataArray.slice(0, max), favoriteDao, projectModels => {
+      dispatch({
+        type: FLUSH_POPULAR_FAVORITE,
+        storeName,
+        pageIndex,
+        projectModels,
+      });
+    });
   };
 }
