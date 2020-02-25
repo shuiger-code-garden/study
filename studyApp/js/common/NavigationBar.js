@@ -8,7 +8,7 @@ import {
   Platform,
   DeviceInfo,
 } from 'react-native';
-import {PropTypes} from 'prop-types';
+import PropTypes from 'prop-types';
 const StatusBarShape = {
   //设置状态栏所接受的属性
   barStyle: PropTypes.oneOf(['light-content', 'default']),
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   //设置组件样式
   container: {
     backgroundColor: '#2196f3',
-    marginTop: DeviceInfo.isIPhoneX_deprecated ? 30 : 0,
+    // marginTop: DeviceInfo.isIPhoneX_deprecated ? 30 : 0,
   },
   // 设置按钮的样式
   navBarButton: {

@@ -6,6 +6,7 @@ import {DeviceInfo, SafeAreaView, StyleSheet} from 'react-native';
 import GlobalStyles from '../res/styles/GlobalStyles';
 import ViewUtil from '../util/ViewUtil';
 import NavigationUtil from '../navigation/navigationUtil';
+import SafeAreaViewPlus from '../common/SafeAreaViewPlus';
 
 /**
  * 通过路由参数加载不同网页
@@ -67,7 +68,7 @@ export default class WebViewPage extends Component {
       />
     );
     return (
-      <SafeAreaView style={GlobalStyles.root_container}>
+      <SafeAreaViewPlus>
         {navigation}
         <WebView
           ref={webView => (this.webView = webView)}
@@ -75,7 +76,7 @@ export default class WebViewPage extends Component {
           onNavigationStateChange={e => this.onNavigationStateChange(e)}
           source={{uri: this.state.url}}
         />
-      </SafeAreaView>
+      </SafeAreaViewPlus>
     );
   }
 }

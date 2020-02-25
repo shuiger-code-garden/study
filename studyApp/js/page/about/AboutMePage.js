@@ -144,7 +144,7 @@ class AboutMePage extends Component {
     );
     return (
       <View style={{flex: 1}}>
-        this.aboutCommon.render(content, this.state.data.author);
+        {this.aboutCommon.render(content, this.state.data.author)}
         <Toast ref={toast => (this.toast = toast)} position={'center'} />
       </View>
     );
@@ -159,4 +159,7 @@ const mapDispatchToProps = dispatch => ({
   dispatch,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AboutMePage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AboutMePage);

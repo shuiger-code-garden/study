@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {PropTypes} from 'prop-types';
+import PropTypes from 'prop-types';
 
 export default class BaseItem extends Component {
   static propTypes = {

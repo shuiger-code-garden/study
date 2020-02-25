@@ -12,6 +12,7 @@ import WelcomePage from '../page/WelcomePage';
 import WebViewPage from '../page/WebViewPage';
 import AboutPage from '../page/about/AboutPage';
 import AboutMePage from '../page/about/AboutMePage';
+import CodePushPage from '../page/CodePushPage';
 
 /**
  *  启动页面路由
@@ -55,6 +56,12 @@ const mainNavigation = createStackNavigator({
   },
   AboutMePage: {
     screen: AboutMePage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  CodePushPage: {
+    screen: CodePushPage,
     navigationOptions: {
       header: null,
     },

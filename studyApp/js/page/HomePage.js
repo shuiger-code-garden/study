@@ -4,6 +4,7 @@ import DynamicBottomNavigation from '../navigation/DynamicBottomNavigation';
 import BackPressComponent from '../common/BackPressComponent';
 import {connect} from 'react-redux';
 import {NavigationActions} from 'react-navigation';
+import SafeAreaViewPlus from '../common/SafeAreaViewPlus';
 class HomePage extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +28,11 @@ class HomePage extends Component {
   };
   render() {
     NavigationUtil.MainNavigation = this.props.navigation;
-    return <DynamicBottomNavigation />;
+    return (
+      <SafeAreaViewPlus>
+        <DynamicBottomNavigation />
+      </SafeAreaViewPlus>
+    );
   }
 }
 

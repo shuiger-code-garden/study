@@ -6,7 +6,7 @@ import {
   View,
   ViewPropTypes,
 } from 'react-native';
-import {PropTypes} from 'prop-types';
+import PropTypes from 'prop-types';
 
 export default class SafeAreaViewPlus extends Component {
   static propTypes = {
@@ -22,7 +22,7 @@ export default class SafeAreaViewPlus extends Component {
     bottomColor: '#f8f8f8',
     enablePlus: true,
     topInset: true,
-    bottomInset: false,
+    bottomInset: true,
   };
   genSafeAreaViewPlus() {
     const {children, topColor, bottomColor, topInset, bottomInset} = this.props;

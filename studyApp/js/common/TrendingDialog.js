@@ -1,13 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Modal,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  View,
-  Platform,
-  DeviceInfo,
-} from 'react-native';
+import {Modal, Text, TouchableOpacity, StyleSheet, View} from 'react-native';
 //Platform模块用于区分移动设备的操作系统及api版本
 //
 

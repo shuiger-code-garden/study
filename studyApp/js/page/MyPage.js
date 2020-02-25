@@ -37,6 +37,8 @@ export default class MyPage extends Component {
       case MORE_MENU.About_Author:
         RouteName = 'AboutMePage';
         break;
+      case MORE_MENU.CodePush:
+        RouteName = 'CodePushPage';
     }
     if (RouteName) {
       NavigationUtil.goPage(RouteName, params);
